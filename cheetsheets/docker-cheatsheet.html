@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Cheatsheet - Visual Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fira+Code:wght@400;600&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="../assets/css/cheatsheet.css">
+</head>
+<body>
+    <div class="hero">
+        <h1>DOCKER CHEATSHEET</h1>
+        <p class="subtitle">Container Platform | Complete Visual Guide to Concepts, Commands & Advanced Topics</p>
+    </div>
+
+    <div class="container">
+        <!-- Architecture Section -->
+        <section class="section">
+            <h2 class="section-title">Docker Architecture</h2>
+            <div class="architecture">
+                <p>Docker uses a client-server architecture to build, ship, and run containerized applications with lightweight isolation.</p>
+                <div class="arch-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">🚀 Applications & Services</div>
+                        <div class="arch-layer-desc">Containerized applications running in isolated environments</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">📦 Containers</div>
+                        <div class="arch-layer-desc">Runtime instances of Docker images with own filesystem, network, and process space</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">🖼️ Docker Images</div>
+                        <div class="arch-layer-desc">Read-only templates with instructions for creating containers</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">⚙️ Docker Engine (dockerd)</div>
+                        <div class="arch-layer-desc">Server daemon managing containers, images, networks, and volumes</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">🐳 Docker Client (docker CLI)</div>
+                        <div class="arch-layer-desc">Command-line interface communicating with Docker daemon via REST API</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">💻 Host Operating System</div>
+                        <div class="arch-layer-desc">Linux kernel with namespaces and cgroups for isolation</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Key Concepts</div>
+                <p><strong>Images:</strong> Immutable templates containing application code, dependencies, and configuration</p>
+                <p><strong>Containers:</strong> Running instances of images, isolated but sharing host kernel</p>
+                <p><strong>Registry:</strong> Storage and distribution system for Docker images (Docker Hub, private registries)</p>
+                <p><strong>Dockerfile:</strong> Text file with instructions to build Docker images</p>
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section class="section">
+            <h2 class="section-title">Installation & Setup</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Ubuntu/Debian Installation</div>
+                    <div class="command-code">curl -fsSL https://get.docker.com -o get-docker.sh<br>sudo sh get-docker.sh<br>sudo usermod -aG docker $USER</div>
+                    <div class="command-desc">Installs Docker Engine using official convenience script</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">RHEL/CentOS Installation</div>
+                    <div class="command-code">sudo yum install -y yum-utils<br>sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo<br>sudo yum install docker-ce docker-ce-cli containerd.io</div>
+                    <div class="command-desc">Installs Docker from official repository</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Start Docker Service</div>
+                    <div class="command-code">sudo systemctl start docker<br>sudo systemctl enable docker</div>
+                    <div class="command-desc">Starts Docker daemon and enables on boot</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Verify Installation</div>
+                    <div class="command-code">docker --version<br>docker run hello-world</div>
+                    <div class="command-desc">Checks Docker version and runs test container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Docker Compose Installation</div>
+                    <div class="command-code">sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose<br>sudo chmod +x /usr/local/bin/docker-compose</div>
+                    <div class="command-desc">Installs Docker Compose for multi-container apps</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Docker Info</div>
+                    <div class="command-code">docker info<br>docker system info</div>
+                    <div class="command-desc">Displays system-wide information about Docker</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Container Lifecycle -->
+        <section class="section">
+            <h2 class="section-title">Container Lifecycle</h2>
+            <div class="visual-flow">
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div class="flow-number">1</div>
+                        <div class="flow-title">Pull/Build</div>
+                        <div class="flow-desc">Get or create image</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">2</div>
+                        <div class="flow-title">Create</div>
+                        <div class="flow-desc">Create container</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">3</div>
+                        <div class="flow-title">Start</div>
+                        <div class="flow-desc">Run container</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">4</div>
+                        <div class="flow-title">Execute</div>
+                        <div class="flow-desc">Run commands</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">5</div>
+                        <div class="flow-title">Stop/Remove</div>
+                        <div class="flow-desc">Clean up</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Container Management -->
+        <section class="section">
+            <h2 class="section-title">Container Management Commands</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Run Container</div>
+                    <div class="command-code">docker run -d --name myapp -p 8080:80 nginx</div>
+                    <div class="command-desc">Creates and starts container in detached mode, maps port 8080 to 80</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> List Containers</div>
+                    <div class="command-code">docker ps<br>docker ps -a</div>
+                    <div class="command-desc">Shows running containers (-a includes stopped containers)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Start Container</div>
+                    <div class="command-code">docker start container-name</div>
+                    <div class="command-desc">Starts a stopped container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Stop Container</div>
+                    <div class="command-code">docker stop container-name</div>
+                    <div class="command-desc">Gracefully stops running container (SIGTERM then SIGKILL)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Restart Container</div>
+                    <div class="command-code">docker restart container-name</div>
+                    <div class="command-desc">Stops and starts container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Kill Container</div>
+                    <div class="command-code">docker kill container-name</div>
+                    <div class="command-desc">Immediately stops container (SIGKILL)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Remove Container</div>
+                    <div class="command-code">docker rm container-name<br>docker rm -f container-name</div>
+                    <div class="command-desc">Deletes container (-f forces removal of running container)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Container Logs</div>
+                    <div class="command-code">docker logs container-name<br>docker logs -f --tail 100 container-name</div>
+                    <div class="command-desc">Views container logs (-f follows, --tail limits lines)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Execute Command</div>
+                    <div class="command-code">docker exec -it container-name bash</div>
+                    <div class="command-desc">Runs interactive bash shell inside running container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Container Stats</div>
+                    <div class="command-code">docker stats<br>docker stats container-name</div>
+                    <div class="command-desc">Shows real-time resource usage statistics</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Inspect Container</div>
+                    <div class="command-code">docker inspect container-name</div>
+                    <div class="command-desc">Returns detailed information in JSON format</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Container Processes</div>
+                    <div class="command-code">docker top container-name</div>
+                    <div class="command-desc">Displays running processes inside container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Pause Container</div>
+                    <div class="command-code">docker pause container-name<br>docker unpause container-name</div>
+                    <div class="command-desc">Suspends/resumes all processes in container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Rename Container</div>
+                    <div class="command-code">docker rename old-name new-name</div>
+                    <div class="command-desc">Changes container name</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Container Diff</div>
+                    <div class="command-code">docker diff container-name</div>
+                    <div class="command-desc">Shows filesystem changes (A=added, D=deleted, C=changed)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">docker</span> Copy Files</div>
+                    <div class="command-code">docker cp container-name:/path/file.txt .<br>docker cp file.txt container-name:/path/</div>
+                    <div class="command-desc">Copies files between container and host</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Run Options -->
+        <section class="section">
+            <h2 class="section-title">Docker Run Options</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Detached Mode</div>
+                    <div class="command-code">docker run -d nginx</div>
+                    <div class="command-desc">Runs container in background, returns container ID</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Interactive Terminal</div>
+                    <div class="command-code">docker run -it ubuntu bash</div>
+                    <div class="command-desc">Allocates TTY and keeps STDIN open for interaction</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Port Mapping</div>
+                    <div class="command-code">docker run -p 8080:80 -p 443:443 nginx</div>
+                    <div class="command-desc">Maps host ports to container ports (host:container)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Environment Variables</div>
+                    <div class="command-code">docker run -e "VAR=value" -e "DB_HOST=localhost" app</div>
+                    <div class="command-desc">Sets environment variables inside container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Volume Mounting</div>
+                    <div class="command-code">docker run -v /host/path:/container/path nginx<br>docker run -v myvolume:/data app</div>
+                    <div class="command-desc">Mounts host directory or named volume into container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Network Mode</div>
+                    <div class="command-code">docker run --network=host nginx<br>docker run --network=mynetwork app</div>
+                    <div class="command-desc">Connects container to specific network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Resource Limits</div>
+                    <div class="command-code">docker run --memory="512m" --cpus="1.5" app</div>
+                    <div class="command-desc">Limits container memory to 512MB and CPU to 1.5 cores</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Auto Remove</div>
+                    <div class="command-code">docker run --rm alpine echo "hello"</div>
+                    <div class="command-desc">Automatically removes container when it exits</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Restart Policy</div>
+                    <div class="command-code">docker run --restart=always nginx<br>docker run --restart=on-failure:3 app</div>
+                    <div class="command-desc">Always restarts or restarts on failure (max 3 times)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Working Directory</div>
+                    <div class="command-code">docker run -w /app node npm start</div>
+                    <div class="command-desc">Sets working directory inside container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">User/Group</div>
+                    <div class="command-code">docker run -u 1000:1000 app<br>docker run --user www-data nginx</div>
+                    <div class="command-desc">Runs container as specific user/group (UID:GID)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Hostname</div>
+                    <div class="command-code">docker run --hostname myhost app</div>
+                    <div class="command-desc">Sets container hostname</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Read-Only Filesystem</div>
+                    <div class="command-code">docker run --read-only --tmpfs /tmp app</div>
+                    <div class="command-desc">Makes root filesystem read-only (tmpfs for writable /tmp)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Privileged Mode</div>
+                    <div class="command-code">docker run --privileged app</div>
+                    <div class="command-desc">Gives extended privileges (access to host devices)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Device Access</div>
+                    <div class="command-code">docker run --device=/dev/sda:/dev/xvdc app</div>
+                    <div class="command-desc">Grants access to host devices</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Container Linking</div>
+                    <div class="command-code">docker run --link mysql:db app</div>
+                    <div class="command-desc">Links to another container (legacy, use networks instead)</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Important Run Flags</div>
+                <p><strong>-d:</strong> Detached (background)</p>
+                <p><strong>-it:</strong> Interactive with TTY</p>
+                <p><strong>-p:</strong> Port mapping</p>
+                <p><strong>-v:</strong> Volume mounting</p>
+                <p><strong>--rm:</strong> Auto-remove on exit</p>
+                <p><strong>--name:</strong> Assign container name</p>
+            </div>
+        </section>
+
+        <!-- Image Management -->
+        <section class="section">
+            <h2 class="section-title">Image Management</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Pull Image</div>
+                    <div class="command-code">docker pull nginx<br>docker pull nginx:1.21-alpine</div>
+                    <div class="command-desc">Downloads image from registry (specific tag or latest)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> List Images</div>
+                    <div class="command-code">docker images<br>docker images -a</div>
+                    <div class="command-desc">Shows downloaded images (-a includes intermediate images)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Build Image</div>
+                    <div class="command-code">docker build -t myapp:1.0 .<br>docker build -t myapp:latest -f Dockerfile.prod .</div>
+                    <div class="command-desc">Builds image from Dockerfile in current directory</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Tag Image</div>
+                    <div class="command-code">docker tag myapp:1.0 registry.com/myapp:1.0</div>
+                    <div class="command-desc">Creates alias/tag for image (for pushing to registry)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Push Image</div>
+                    <div class="command-code">docker push registry.com/myapp:1.0</div>
+                    <div class="command-desc">Uploads image to Docker registry</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Remove Image</div>
+                    <div class="command-code">docker rmi image-name<br>docker rmi -f image-name</div>
+                    <div class="command-desc">Deletes image (-f forces removal)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Image History</div>
+                    <div class="command-code">docker history image-name</div>
+                    <div class="command-desc">Shows layers and commands that created image</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Inspect Image</div>
+                    <div class="command-code">docker inspect image-name</div>
+                    <div class="command-desc">Returns detailed image information in JSON</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Save Image</div>
+                    <div class="command-code">docker save -o myapp.tar myapp:1.0</div>
+                    <div class="command-desc">Exports image to tar archive</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Load Image</div>
+                    <div class="command-code">docker load -i myapp.tar</div>
+                    <div class="command-desc">Imports image from tar archive</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Search Images</div>
+                    <div class="command-code">docker search nginx</div>
+                    <div class="command-desc">Searches Docker Hub for images</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Prune Images</div>
+                    <div class="command-code">docker image prune<br>docker image prune -a</div>
+                    <div class="command-desc">Removes unused images (-a removes all untagged)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Create from Container</div>
+                    <div class="command-code">docker commit container-name myimage:1.0</div>
+                    <div class="command-desc">Creates new image from container's changes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Export Container</div>
+                    <div class="command-code">docker export container-name > container.tar</div>
+                    <div class="command-desc">Exports container filesystem as tar archive</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Import Archive</div>
+                    <div class="command-code">docker import container.tar myimage:1.0</div>
+                    <div class="command-desc">Creates image from tarball</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">docker</span> Build with Args</div>
+                    <div class="command-code">docker build --build-arg VERSION=1.0 -t app .</div>
+                    <div class="command-desc">Passes build-time variables to Dockerfile</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dockerfile -->
+        <section class="section">
+            <h2 class="section-title">Dockerfile Instructions</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">FROM</div>
+                    <div class="command-code">FROM ubuntu:20.04<br>FROM node:16-alpine AS builder</div>
+                    <div class="command-desc">Sets base image (must be first instruction, AS for multi-stage)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">RUN</div>
+                    <div class="command-code">RUN apt-get update && apt-get install -y curl<br>RUN ["npm", "install"]</div>
+                    <div class="command-desc">Executes commands during build (creates new layer)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">COPY / ADD</div>
+                    <div class="command-code">COPY app.js /app/<br>COPY --chown=node:node . /app<br>ADD https://example.com/file.tar.gz /app/</div>
+                    <div class="command-desc">COPY copies files/dirs; ADD supports URLs and auto-extracts tar</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">WORKDIR</div>
+                    <div class="command-code">WORKDIR /app</div>
+                    <div class="command-desc">Sets working directory for subsequent instructions</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">CMD</div>
+                    <div class="command-code">CMD ["nginx", "-g", "daemon off;"]<br>CMD npm start</div>
+                    <div class="command-desc">Default command when container starts (overridable at runtime)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">ENTRYPOINT</div>
+                    <div class="command-code">ENTRYPOINT ["python", "app.py"]<br>ENTRYPOINT ["/entrypoint.sh"]</div>
+                    <div class="command-desc">Configures container as executable (not easily overridable)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">ENV</div>
+                    <div class="command-code">ENV NODE_ENV=production<br>ENV PATH=/app/bin:$PATH</div>
+                    <div class="command-desc">Sets environment variables</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">EXPOSE</div>
+                    <div class="command-code">EXPOSE 80 443<br>EXPOSE 8080/tcp</div>
+                    <div class="command-desc">Documents which ports container listens on (metadata only)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">VOLUME</div>
+                    <div class="command-code">VOLUME ["/data", "/logs"]<br>VOLUME /var/lib/mysql</div>
+                    <div class="command-desc">Creates mount point for external volumes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">USER</div>
+                    <div class="command-code">USER node<br>USER 1000:1000</div>
+                    <div class="command-desc">Sets user/group for RUN, CMD, ENTRYPOINT</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">ARG</div>
+                    <div class="command-code">ARG VERSION=latest<br>ARG BUILD_DATE</div>
+                    <div class="command-desc">Defines build-time variables (use with --build-arg)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">LABEL</div>
+                    <div class="command-code">LABEL version="1.0"<br>LABEL maintainer="user@example.com"</div>
+                    <div class="command-desc">Adds metadata to image</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">HEALTHCHECK</div>
+                    <div class="command-code">HEALTHCHECK --interval=30s --timeout=3s \<br>  CMD curl -f http://localhost/ || exit 1</div>
+                    <div class="command-desc">Defines health check command for container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">ONBUILD</div>
+                    <div class="command-code">ONBUILD COPY . /app<br>ONBUILD RUN npm install</div>
+                    <div class="command-desc">Adds trigger instruction when image is used as base</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">STOPSIGNAL</div>
+                    <div class="command-code">STOPSIGNAL SIGTERM</div>
+                    <div class="command-desc">Sets signal to stop container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">SHELL</div>
+                    <div class="command-code">SHELL ["/bin/bash", "-c"]</div>
+                    <div class="command-desc">Overrides default shell for RUN commands</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Multi-Stage Build Example</div>
+                <p><code>FROM node:16 AS builder<br>WORKDIR /app<br>COPY package*.json ./<br>RUN npm install<br>COPY . .<br>RUN npm run build<br><br>FROM nginx:alpine<br>COPY --from=builder /app/dist /usr/share/nginx/html<br>EXPOSE 80</code></p>
+                <p style="margin-top: 0.5rem;">Reduces final image size by separating build and runtime stages</p>
+            </div>
+        </section>
+
+        <!-- Volumes -->
+        <section class="section">
+            <h2 class="section-title">Volume Management</h2>
+            <div class="info-box">
+                <div class="info-box-title">Volume Types</div>
+                <p><strong>Named Volumes:</strong> Managed by Docker, stored in /var/lib/docker/volumes/</p>
+                <p><strong>Bind Mounts:</strong> Map host filesystem path to container path</p>
+                <p><strong>tmpfs Mounts:</strong> Stored in host memory, not persisted on disk</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Create Volume</div>
+                    <div class="command-code">docker volume create myvolume<br>docker volume create --driver local myvolume</div>
+                    <div class="command-desc">Creates named volume for persistent data</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Volumes</div>
+                    <div class="command-code">docker volume ls</div>
+                    <div class="command-desc">Shows all volumes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Inspect Volume</div>
+                    <div class="command-code">docker volume inspect myvolume</div>
+                    <div class="command-desc">Displays detailed volume information</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Volume</div>
+                    <div class="command-code">docker volume rm myvolume</div>
+                    <div class="command-desc">Deletes volume (must not be in use)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Prune Volumes</div>
+                    <div class="command-code">docker volume prune</div>
+                    <div class="command-desc">Removes all unused volumes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Named Volume Mount</div>
+                    <div class="command-code">docker run -v myvolume:/data app<br>docker run --mount source=myvolume,target=/data app</div>
+                    <div class="command-desc">Mounts named volume to container path</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Bind Mount</div>
+                    <div class="command-code">docker run -v /host/path:/container/path app<br>docker run -v $(pwd):/app node</div>
+                    <div class="command-desc">Mounts host directory into container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Read-Only Mount</div>
+                    <div class="command-code">docker run -v myvolume:/data:ro app<br>docker run -v /host/path:/app:ro node</div>
+                    <div class="command-desc">Mounts volume as read-only</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">tmpfs Mount</div>
+                    <div class="command-code">docker run --tmpfs /tmp app<br>docker run --mount type=tmpfs,destination=/tmp app</div>
+                    <div class="command-desc">Creates temporary filesystem in memory</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Volume from Container</div>
+                    <div class="command-code">docker run --volumes-from container1 app</div>
+                    <div class="command-desc">Mounts all volumes from another container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Backup Volume</div>
+                    <div class="command-code">docker run --rm -v myvolume:/data -v $(pwd):/backup \<br>  ubuntu tar czf /backup/backup.tar.gz -C /data .</div>
+                    <div class="command-desc">Creates tar archive of volume contents</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Restore Volume</div>
+                    <div class="command-code">docker run --rm -v myvolume:/data -v $(pwd):/backup \<br>  ubuntu tar xzf /backup/backup.tar.gz -C /data</div>
+                    <div class="command-desc">Extracts backup into volume</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Networking -->
+        <section class="section">
+            <h2 class="section-title">Network Configuration</h2>
+            <div class="network-diagram">
+                <h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">Network Drivers</h3>
+                <div class="network-types">
+                    <div class="network-card">
+                        <div class="network-icon">🌉</div>
+                        <div class="network-title">Bridge (Default)</div>
+                        <div class="command-desc">Private internal network, containers can communicate, NAT to outside</div>
+                    </div>
+                    <div class="network-card">
+                        <div class="network-icon">🖥️</div>
+                        <div class="network-title">Host</div>
+                        <div class="command-desc">Removes network isolation, container uses host's network directly</div>
+                    </div>
+                    <div class="network-card">
+                        <div class="network-icon">🔒</div>
+                        <div class="network-title">None</div>
+                        <div class="command-desc">Disables networking, container is completely isolated</div>
+                    </div>
+                    <div class="network-card">
+                        <div class="network-icon">🌐</div>
+                        <div class="network-title">Overlay</div>
+                        <div class="command-desc">Multi-host networking for Docker Swarm clusters</div>
+                    </div>
+                    <div class="network-card">
+                        <div class="network-icon">📡</div>
+                        <div class="network-title">Macvlan</div>
+                        <div class="command-desc">Assigns MAC address, appears as physical device on network</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">List Networks</div>
+                    <div class="command-code">docker network ls</div>
+                    <div class="command-desc">Shows all Docker networks</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create Network</div>
+                    <div class="command-code">docker network create mynetwork<br>docker network create --driver bridge mybridge</div>
+                    <div class="command-desc">Creates user-defined network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create with Subnet</div>
+                    <div class="command-code">docker network create --subnet=172.18.0.0/16 \<br>  --gateway=172.18.0.1 mynetwork</div>
+                    <div class="command-desc">Creates network with custom IP range</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Inspect Network</div>
+                    <div class="command-code">docker network inspect mynetwork</div>
+                    <div class="command-desc">Shows network configuration and connected containers</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Connect Container</div>
+                    <div class="command-code">docker network connect mynetwork container-name</div>
+                    <div class="command-desc">Attaches running container to network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Disconnect Container</div>
+                    <div class="command-code">docker network disconnect mynetwork container-name</div>
+                    <div class="command-desc">Detaches container from network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Network</div>
+                    <div class="command-code">docker network rm mynetwork</div>
+                    <div class="command-desc">Deletes network (no containers can be connected)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Prune Networks</div>
+                    <div class="command-code">docker network prune</div>
+                    <div class="command-desc">Removes all unused networks</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Run with Network</div>
+                    <div class="command-code">docker run --network=mynetwork nginx<br>docker run --network=host app</div>
+                    <div class="command-desc">Starts container on specific network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Network Alias</div>
+                    <div class="command-code">docker run --network=mynet --network-alias=db mysql</div>
+                    <div class="command-desc">Adds DNS alias for container on network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Expose Ports</div>
+                    <div class="command-code">docker run -p 8080:80 -p 443:443 nginx<br>docker run -P nginx</div>
+                    <div class="command-desc">Maps ports (-P maps all EXPOSE ports to random host ports)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">IP Address</div>
+                    <div class="command-code">docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container</div>
+                    <div class="command-desc">Gets container IP address</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Network Communication</div>
+                <p>Containers on the same user-defined network can communicate using container names as hostnames (automatic DNS resolution)</p>
+                <p style="margin-top: 0.5rem;">Example: <code>docker run --network=mynet --name=api api-app</code><br><code>docker run --network=mynet web-app</code><br>web-app can connect to api using hostname "api"</p>
+            </div>
+        </section>
+
+        <!-- Docker Compose -->
+        <section class="section">
+            <h2 class="section-title">Docker Compose</h2>
+            <div class="info-box">
+                <div class="info-box-title">What is Docker Compose?</div>
+                <p>Docker Compose is a tool for defining and running multi-container applications using a YAML file. It simplifies complex container orchestration with declarative configuration.</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Start Services</div>
+                    <div class="command-code">docker-compose up<br>docker-compose up -d</div>
+                    <div class="command-desc">Creates and starts containers (-d for detached mode)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Stop Services</div>
+                    <div class="command-code">docker-compose down<br>docker-compose down -v</div>
+                    <div class="command-desc">Stops and removes containers (-v removes volumes)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Build Images</div>
+                    <div class="command-code">docker-compose build<br>docker-compose build --no-cache</div>
+                    <div class="command-desc">Builds or rebuilds services</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Start/Stop Services</div>
+                    <div class="command-code">docker-compose start<br>docker-compose stop<br>docker-compose restart</div>
+                    <div class="command-desc">Controls service lifecycle without removing containers</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Services</div>
+                    <div class="command-code">docker-compose ps</div>
+                    <div class="command-desc">Shows status of services</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">View Logs</div>
+                    <div class="command-code">docker-compose logs<br>docker-compose logs -f service-name</div>
+                    <div class="command-desc">Displays logs from services (-f follows)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Execute Command</div>
+                    <div class="command-code">docker-compose exec service-name bash<br>docker-compose exec db mysql -u root -p</div>
+                    <div class="command-desc">Runs command in running service container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Run One-Time Command</div>
+                    <div class="command-code">docker-compose run web python manage.py migrate</div>
+                    <div class="command-desc">Creates new container and runs command</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Scale Services</div>
+                    <div class="command-code">docker-compose up --scale web=3</div>
+                    <div class="command-desc">Runs multiple instances of service</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Pull Images</div>
+                    <div class="command-code">docker-compose pull</div>
+                    <div class="command-desc">Downloads latest images for services</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Validate Config</div>
+                    <div class="command-code">docker-compose config</div>
+                    <div class="command-desc">Validates and displays compose file</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Custom Compose File</div>
+                    <div class="command-code">docker-compose -f custom.yml up</div>
+                    <div class="command-desc">Uses specified compose file instead of default</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Pause/Unpause</div>
+                    <div class="command-code">docker-compose pause<br>docker-compose unpause</div>
+                    <div class="command-desc">Pauses/resumes all service processes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Services</div>
+                    <div class="command-code">docker-compose rm<br>docker-compose rm -f -s -v</div>
+                    <div class="command-desc">Removes stopped containers (-f force, -s stop, -v volumes)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">View Processes</div>
+                    <div class="command-code">docker-compose top</div>
+                    <div class="command-desc">Displays running processes in containers</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">View Events</div>
+                    <div class="command-code">docker-compose events</div>
+                    <div class="command-desc">Streams real-time events from containers</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">docker-compose.yml Example</div>
+                <p><code>version: '3.8'<br>services:<br>&nbsp;&nbsp;web:<br>&nbsp;&nbsp;&nbsp;&nbsp;build: .<br>&nbsp;&nbsp;&nbsp;&nbsp;ports:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- "8080:80"<br>&nbsp;&nbsp;&nbsp;&nbsp;volumes:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ./app:/app<br>&nbsp;&nbsp;&nbsp;&nbsp;environment:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- NODE_ENV=production<br>&nbsp;&nbsp;&nbsp;&nbsp;depends_on:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- db<br>&nbsp;&nbsp;db:<br>&nbsp;&nbsp;&nbsp;&nbsp;image: postgres:13<br>&nbsp;&nbsp;&nbsp;&nbsp;volumes:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- db-data:/var/lib/postgresql/data<br>&nbsp;&nbsp;&nbsp;&nbsp;environment:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POSTGRES_PASSWORD: secret<br>volumes:<br>&nbsp;&nbsp;db-data:</code></p>
+            </div>
+        </section>
+
+        <!-- Docker Swarm -->
+        <section class="section">
+            <h2 class="section-title">Docker Swarm Mode</h2>
+            <div class="info-box">
+                <div class="info-box-title">What is Docker Swarm?</div>
+                <p>Docker Swarm is native clustering and orchestration for Docker. It turns multiple Docker hosts into a single virtual host with automatic load balancing, service discovery, and rolling updates.</p>
+                <p style="margin-top: 0.5rem;"><strong>Key Concepts:</strong> Manager nodes (control plane), Worker nodes (run tasks), Services (desired state), Tasks (container instances)</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Initialize Swarm</div>
+                    <div class="command-code">docker swarm init<br>docker swarm init --advertise-addr 192.168.1.100</div>
+                    <div class="command-desc">Creates swarm cluster on current node as manager</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Join Swarm (Worker)</div>
+                    <div class="command-code">docker swarm join --token SWMTKN-... 192.168.1.100:2377</div>
+                    <div class="command-desc">Joins worker node to existing swarm (use token from init)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Join Swarm (Manager)</div>
+                    <div class="command-code">docker swarm join-token manager<br>docker swarm join --token SWMTKN-... 192.168.1.100:2377</div>
+                    <div class="command-desc">Gets manager token and joins as manager node</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Get Join Token</div>
+                    <div class="command-code">docker swarm join-token worker<br>docker swarm join-token manager</div>
+                    <div class="command-desc">Displays join command with token for workers/managers</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Nodes</div>
+                    <div class="command-code">docker node ls</div>
+                    <div class="command-desc">Shows all nodes in swarm with status and role</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Inspect Node</div>
+                    <div class="command-code">docker node inspect node-name</div>
+                    <div class="command-desc">Displays detailed node information</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Promote/Demote Node</div>
+                    <div class="command-code">docker node promote node-name<br>docker node demote node-name</div>
+                    <div class="command-desc">Changes node between worker and manager role</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Update Node Availability</div>
+                    <div class="command-code">docker node update --availability drain node-name<br>docker node update --availability active node-name</div>
+                    <div class="command-desc">Sets node to drain (evacuate tasks) or active</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Node</div>
+                    <div class="command-code">docker node rm node-name<br>docker node rm -f node-name</div>
+                    <div class="command-desc">Removes node from swarm (node must be down)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Leave Swarm</div>
+                    <div class="command-code">docker swarm leave<br>docker swarm leave --force</div>
+                    <div class="command-desc">Removes current node from swarm (--force for manager)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Swarm Info</div>
+                    <div class="command-code">docker info</div>
+                    <div class="command-desc">Shows swarm status and configuration</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Update Swarm Config</div>
+                    <div class="command-code">docker swarm update --autolock=true</div>
+                    <div class="command-desc">Updates swarm configuration (autolock protects encryption keys)</div>
+                </div>
+            </div>
+
+            <div class="visual-flow">
+                <h3 style="color: var(--accent-tertiary); margin-bottom: 1rem; text-align: center;">Swarm Architecture</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div class="flow-number">1</div>
+                        <div class="flow-title">Manager Nodes</div>
+                        <div class="flow-desc">Orchestration, scheduling, cluster management</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">2</div>
+                        <div class="flow-title">Worker Nodes</div>
+                        <div class="flow-desc">Execute tasks assigned by managers</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">3</div>
+                        <div class="flow-title">Services</div>
+                        <div class="flow-desc">Define desired state (replicas, image, etc.)</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">4</div>
+                        <div class="flow-title">Tasks</div>
+                        <div class="flow-desc">Running container instances</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Swarm Best Practices</div>
+                <p>✓ Use odd number of manager nodes (3, 5, 7) for high availability</p>
+                <p>✓ Don't exceed 7 manager nodes (Raft consensus overhead)</p>
+                <p>✓ Place managers in different availability zones</p>
+                <p>✓ Use drain availability for maintenance without disruption</p>
+                <p>✓ Enable autolock to protect encryption keys</p>
+            </div>
+        </section>
+
+        <!-- Docker Services -->
+        <section class="section">
+            <h2 class="section-title">Docker Services (Swarm)</h2>
+            <div class="info-box">
+                <div class="info-box-title">Services vs Containers</div>
+                <p>Services are the desired state for your application in swarm mode. Swarm automatically creates and manages containers (tasks) to match the service definition, with features like scaling, rolling updates, and self-healing.</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Create Service</div>
+                    <div class="command-code">docker service create --name web \<br>  --replicas 3 -p 8080:80 nginx</div>
+                    <div class="command-desc">Creates service with 3 replicas, publishes port 8080</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Services</div>
+                    <div class="command-code">docker service ls</div>
+                    <div class="command-desc">Shows all services with replica count and status</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Service Details</div>
+                    <div class="command-code">docker service ps service-name</div>
+                    <div class="command-desc">Lists all tasks (containers) for service with node placement</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Inspect Service</div>
+                    <div class="command-code">docker service inspect service-name<br>docker service inspect --pretty service-name</div>
+                    <div class="command-desc">Displays detailed service configuration (--pretty for readable)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Scale Service</div>
+                    <div class="command-code">docker service scale web=5<br>docker service scale web=5 api=3</div>
+                    <div class="command-desc">Changes number of replicas (can scale multiple services)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Update Service</div>
+                    <div class="command-code">docker service update --image nginx:1.21 web<br>docker service update --env-add ENV=prod web</div>
+                    <div class="command-desc">Updates service with rolling update (new image, env vars, etc.)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Rollback Service</div>
+                    <div class="command-code">docker service rollback service-name</div>
+                    <div class="command-desc">Rolls back to previous service configuration</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Service</div>
+                    <div class="command-code">docker service rm service-name</div>
+                    <div class="command-desc">Deletes service and all its tasks</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Service Logs</div>
+                    <div class="command-code">docker service logs service-name<br>docker service logs -f --tail 100 service-name</div>
+                    <div class="command-desc">Views logs from all service tasks</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Update Constraints</div>
+                    <div class="command-code">docker service update \<br>  --constraint-add node.role==worker web</div>
+                    <div class="command-desc">Adds placement constraint (only run on worker nodes)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Resource Limits</div>
+                    <div class="command-code">docker service update \<br>  --limit-cpu 1 --limit-memory 512M \<br>  --reserve-cpu 0.5 --reserve-memory 256M web</div>
+                    <div class="command-desc">Sets CPU/memory limits and reservations</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Update Parallelism</div>
+                    <div class="command-code">docker service update \<br>  --update-parallelism 2 \<br>  --update-delay 10s web</div>
+                    <div class="command-desc">Updates 2 tasks at a time with 10s delay between</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Global Service</div>
+                    <div class="command-code">docker service create --mode global \<br>  --name monitor monitoring-agent</div>
+                    <div class="command-desc">Runs one task on every node (useful for monitoring)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Add Volume</div>
+                    <div class="command-code">docker service create \<br>  --mount type=volume,source=data,target=/data app</div>
+                    <div class="command-desc">Mounts volume to service tasks</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Service Networks</div>
+                    <div class="command-code">docker service create \<br>  --network mynetwork web</div>
+                    <div class="command-desc">Connects service to overlay network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Publish Ports</div>
+                    <div class="command-code">docker service create \<br>  --publish published=8080,target=80,mode=ingress web</div>
+                    <div class="command-desc">Publishes port with ingress load balancing</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Service Update Strategies</div>
+                <p><strong>Rolling Update (default):</strong> Gradually replaces tasks one by one or in batches</p>
+                <p><strong>Update Order:</strong> stop-first (default) or start-first</p>
+                <p><strong>Failure Action:</strong> pause (default), continue, or rollback</p>
+            </div>
+        </section>
+
+        <!-- Docker Stack -->
+        <section class="section">
+            <h2 class="section-title">Docker Stack (Swarm)</h2>
+            <div class="info-box">
+                <div class="info-box-title">What is Docker Stack?</div>
+                <p>Docker Stack allows you to deploy multi-service applications to a swarm using a Compose file. It's the production-ready way to manage complex applications in swarm mode with declarative configuration.</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Deploy Stack</div>
+                    <div class="command-code">docker stack deploy -c docker-compose.yml mystack</div>
+                    <div class="command-desc">Deploys or updates stack from compose file</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Stacks</div>
+                    <div class="command-code">docker stack ls</div>
+                    <div class="command-desc">Shows all deployed stacks</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Stack Services</div>
+                    <div class="command-code">docker stack services mystack</div>
+                    <div class="command-desc">Lists all services in stack</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Stack Tasks</div>
+                    <div class="command-code">docker stack ps mystack</div>
+                    <div class="command-desc">Shows all tasks (containers) in stack with node placement</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Stack</div>
+                    <div class="command-code">docker stack rm mystack</div>
+                    <div class="command-desc">Removes stack and all its services, networks, volumes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Multiple Compose Files</div>
+                    <div class="command-code">docker stack deploy \<br>  -c docker-compose.yml \<br>  -c docker-compose.prod.yml mystack</div>
+                    <div class="command-desc">Deploys stack with merged compose files (overrides)</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Stack Compose File Example</div>
+                <p><code>version: '3.8'<br>services:<br>&nbsp;&nbsp;web:<br>&nbsp;&nbsp;&nbsp;&nbsp;image: nginx:alpine<br>&nbsp;&nbsp;&nbsp;&nbsp;deploy:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;replicas: 3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;update_config:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parallelism: 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delay: 10s<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;restart_policy:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;condition: on-failure<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;placement:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constraints:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- node.role == worker<br>&nbsp;&nbsp;&nbsp;&nbsp;ports:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- "8080:80"<br>&nbsp;&nbsp;&nbsp;&nbsp;networks:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- webnet<br>networks:<br>&nbsp;&nbsp;webnet:<br>&nbsp;&nbsp;&nbsp;&nbsp;driver: overlay</code></p>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Stack vs Compose Differences</div>
+                <p>• Stack ignores <code>build:</code> directive (use pre-built images)</p>
+                <p>• Use <code>deploy:</code> section for swarm-specific configs</p>
+                <p>• Networks are automatically created as overlay type</p>
+                <p>• Volume drivers must be available on all nodes</p>
+                <p>• <code>docker-compose up</code> works on single host; <code>docker stack deploy</code> for swarm</p>
+            </div>
+        </section>
+
+        <!-- Secrets Management -->
+        <section class="section">
+            <h2 class="section-title">Docker Secrets (Swarm)</h2>
+            <div class="info-box">
+                <div class="info-box-title">What are Docker Secrets?</div>
+                <p>Docker Secrets provide secure storage and transmission of sensitive data (passwords, API keys, certificates) to services in swarm mode. Secrets are encrypted at rest and in transit, only available to services explicitly granted access.</p>
+                <p style="margin-top: 0.5rem;"><strong>Storage:</strong> In-memory tmpfs at <code>/run/secrets/</code> inside containers (never written to disk)</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Create Secret (stdin)</div>
+                    <div class="command-code">echo "mysecretpassword" | docker secret create db_password -</div>
+                    <div class="command-desc">Creates secret from stdin (dash indicates stdin)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create Secret (file)</div>
+                    <div class="command-code">docker secret create db_password ./password.txt</div>
+                    <div class="command-desc">Creates secret from file contents</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Secrets</div>
+                    <div class="command-code">docker secret ls</div>
+                    <div class="command-desc">Shows all secrets (values are never displayed)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Inspect Secret</div>
+                    <div class="command-code">docker secret inspect db_password</div>
+                    <div class="command-desc">Shows metadata (not the actual secret value)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Secret</div>
+                    <div class="command-code">docker secret rm db_password</div>
+                    <div class="command-desc">Deletes secret (must not be in use by any service)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Service with Secret</div>
+                    <div class="command-code">docker service create \<br>  --name db \<br>  --secret db_password \<br>  postgres</div>
+                    <div class="command-desc">Creates service with access to secret</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Custom Secret Path</div>
+                    <div class="command-code">docker service create \<br>  --secret source=db_password,target=password.txt \<br>  myapp</div>
+                    <div class="command-desc">Mounts secret at custom path (/run/secrets/password.txt)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Secret with Permissions</div>
+                    <div class="command-code">docker service create \<br>  --secret source=cert,target=app.crt,mode=0400 \<br>  web</div>
+                    <div class="command-desc">Sets file permissions on secret (0400 = read-only for owner)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Update Service Secret</div>
+                    <div class="command-code">docker service update \<br>  --secret-rm old_password \<br>  --secret-add new_password \<br>  myservice</div>
+                    <div class="command-desc">Replaces secret in running service (triggers rolling update)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Read Secret in Container</div>
+                    <div class="command-code">cat /run/secrets/db_password<br>DB_PASS=$(cat /run/secrets/db_password)</div>
+                    <div class="command-desc">Applications read secrets from /run/secrets/ directory</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Stack with Secrets</div>
+                    <div class="command-code">services:<br>&nbsp;&nbsp;db:<br>&nbsp;&nbsp;&nbsp;&nbsp;image: postgres<br>&nbsp;&nbsp;&nbsp;&nbsp;secrets:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- db_password<br>secrets:<br>&nbsp;&nbsp;db_password:<br>&nbsp;&nbsp;&nbsp;&nbsp;external: true</div>
+                    <div class="command-desc">References secret in stack compose file (must exist)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create Secret in Stack</div>
+                    <div class="command-code">secrets:<br>&nbsp;&nbsp;db_password:<br>&nbsp;&nbsp;&nbsp;&nbsp;file: ./password.txt</div>
+                    <div class="command-desc">Creates secret from file during stack deployment</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Secret Best Practices</div>
+                <p>✓ Never commit secrets to version control</p>
+                <p>✓ Use external secrets in production (managed outside stack file)</p>
+                <p>✓ Rotate secrets regularly by creating new ones and updating services</p>
+                <p>✓ Use principle of least privilege (only grant access to services that need it)</p>
+                <p>✓ Secrets are immutable - create new secret to update value</p>
+                <p>✓ Combine secrets with environment variables: <code>POSTGRES_PASSWORD_FILE=/run/secrets/db_password</code></p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Secrets vs Environment Variables</div>
+                <p><strong>Secrets:</strong> Encrypted, not visible in <code>docker inspect</code>, in-memory only, swarm-only</p>
+                <p><strong>Environment Variables:</strong> Plaintext, visible in inspect, stored in config, work everywhere</p>
+                <p style="margin-top: 0.5rem;">Use secrets for sensitive data in production swarm deployments</p>
+            </div>
+        </section>
+
+        <!-- Configs -->
+        <section class="section">
+            <h2 class="section-title">Docker Configs (Swarm)</h2>
+            <div class="info-box">
+                <div class="info-box-title">What are Docker Configs?</div>
+                <p>Docker Configs provide a way to store non-sensitive configuration data outside container images. Similar to secrets but for public data like nginx.conf, app settings, or certificates. Available in swarm mode only.</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Create Config</div>
+                    <div class="command-code">docker config create nginx_config nginx.conf<br>echo "config data" | docker config create app_config -</div>
+                    <div class="command-desc">Creates config from file or stdin</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Configs</div>
+                    <div class="command-code">docker config ls</div>
+                    <div class="command-desc">Shows all configs</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Inspect Config</div>
+                    <div class="command-code">docker config inspect nginx_config</div>
+                    <div class="command-desc">Displays config data and metadata</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove Config</div>
+                    <div class="command-code">docker config rm nginx_config</div>
+                    <div class="command-desc">Deletes config (must not be in use)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Service with Config</div>
+                    <div class="command-code">docker service create \<br>  --config source=nginx_config,target=/etc/nginx/nginx.conf \<br>  nginx</div>
+                    <div class="command-desc">Mounts config at specified path in container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Stack with Configs</div>
+                    <div class="command-code">services:<br>&nbsp;&nbsp;web:<br>&nbsp;&nbsp;&nbsp;&nbsp;configs:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- source: nginx_config<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target: /etc/nginx/nginx.conf<br>configs:<br>&nbsp;&nbsp;nginx_config:<br>&nbsp;&nbsp;&nbsp;&nbsp;file: ./nginx.conf</div>
+                    <div class="command-desc">Uses config in stack deployment</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Management -->
+        <section class="section">
+            <h2 class="section-title">System Management & Cleanup</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">System Information</div>
+                    <div class="command-code">docker system info<br>docker version</div>
+                    <div class="command-desc">Displays Docker system information and versions</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Disk Usage</div>
+                    <div class="command-code">docker system df<br>docker system df -v</div>
+                    <div class="command-desc">Shows space used by images, containers, volumes (-v verbose)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">System Prune</div>
+                    <div class="command-code">docker system prune<br>docker system prune -a --volumes</div>
+                    <div class="command-desc">Removes unused data (-a all images, --volumes includes volumes)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Container Prune</div>
+                    <div class="command-code">docker container prune<br>docker container prune -f</div>
+                    <div class="command-desc">Removes stopped containers (-f force without prompt)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Image Prune</div>
+                    <div class="command-code">docker image prune<br>docker image prune -a</div>
+                    <div class="command-desc">Removes dangling images (-a removes all unused images)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Volume Prune</div>
+                    <div class="command-code">docker volume prune</div>
+                    <div class="command-desc">Removes all unused volumes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Network Prune</div>
+                    <div class="command-code">docker network prune</div>
+                    <div class="command-desc">Removes all unused networks</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Events Stream</div>
+                    <div class="command-code">docker events<br>docker events --since '2024-01-01'</div>
+                    <div class="command-desc">Shows real-time events from Docker daemon</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove All Containers</div>
+                    <div class="command-code">docker rm -f $(docker ps -aq)</div>
+                    <div class="command-desc">Force removes all containers (stopped and running)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Remove All Images</div>
+                    <div class="command-code">docker rmi -f $(docker images -q)</div>
+                    <div class="command-desc">Force removes all images</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Stop All Containers</div>
+                    <div class="command-code">docker stop $(docker ps -q)</div>
+                    <div class="command-desc">Stops all running containers</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Login to Registry</div>
+                    <div class="command-code">docker login<br>docker login registry.example.com</div>
+                    <div class="command-desc">Authenticates with Docker Hub or custom registry</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Logout from Registry</div>
+                    <div class="command-code">docker logout</div>
+                    <div class="command-desc">Removes credentials from local store</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Context Management</div>
+                    <div class="command-code">docker context ls<br>docker context use remote-host</div>
+                    <div class="command-desc">Manages Docker contexts (local, remote, swarm)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Export/Import Context</div>
+                    <div class="command-code">docker context export mycontext<br>docker context import mycontext context.tar</div>
+                    <div class="command-desc">Exports/imports context configuration</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Plugin Management</div>
+                    <div class="command-code">docker plugin ls<br>docker plugin install plugin-name</div>
+                    <div class="command-desc">Lists and installs Docker plugins</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="section">
+            <h2 class="section-title">Monitoring & Debugging</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Container Stats</div>
+                    <div class="command-code">docker stats<br>docker stats --no-stream</div>
+                    <div class="command-desc">Real-time resource usage (--no-stream shows once)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Container Logs</div>
+                    <div class="command-code">docker logs -f --tail 100 --since 10m container</div>
+                    <div class="command-desc">Follows logs, last 100 lines, since 10 minutes ago</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Container Processes</div>
+                    <div class="command-code">docker top container-name</div>
+                    <div class="command-desc">Shows running processes inside container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Port Mappings</div>
+                    <div class="command-code">docker port container-name</div>
+                    <div class="command-desc">Lists port mappings for container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Container Inspect</div>
+                    <div class="command-code">docker inspect container-name<br>docker inspect -f '{{.State.Status}}' container</div>
+                    <div class="command-desc">Detailed info (-f formats output with Go template)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Health Check Status</div>
+                    <div class="command-code">docker inspect --format='{{.State.Health.Status}}' container</div>
+                    <div class="command-desc">Shows health check status (healthy, unhealthy, starting)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Container Changes</div>
+                    <div class="command-code">docker diff container-name</div>
+                    <div class="command-desc">Shows filesystem changes (A=added, D=deleted, C=modified)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Wait for Container</div>
+                    <div class="command-code">docker wait container-name</div>
+                    <div class="command-desc">Blocks until container stops, returns exit code</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Container Resource Usage</div>
+                    <div class="command-code">docker container inspect -f '{{.HostConfig.Memory}}' container</div>
+                    <div class="command-desc">Shows configured resource limits</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Debug Container</div>
+                    <div class="command-code">docker run -it --rm --pid=container:target \<br>  --net=container:target --cap-add sys_admin \<br>  nicolaka/netshoot</div>
+                    <div class="command-desc">Attaches debugging tools to running container</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Export Logs</div>
+                    <div class="command-code">docker logs container > logs.txt 2>&1</div>
+                    <div class="command-desc">Exports all logs to file (stdout and stderr)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Check Exit Code</div>
+                    <div class="command-code">docker inspect -f '{{.State.ExitCode}}' container</div>
+                    <div class="command-desc">Gets container exit code (0 = success)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Topics -->
+        <section class="section">
+            <h2 class="section-title">Advanced Topics</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Multi-Stage Build</div>
+                    <div class="command-code">FROM node:16 AS builder<br>WORKDIR /app<br>COPY . .<br>RUN npm run build<br><br>FROM nginx:alpine<br>COPY --from=builder /app/dist /usr/share/nginx/html</div>
+                    <div class="command-desc">Separates build and runtime stages for smaller images</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Build Cache Control</div>
+                    <div class="command-code">docker build --no-cache -t app .<br>docker build --pull -t app .</div>
+                    <div class="command-desc">Disables cache or pulls latest base image</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">BuildKit Features</div>
+                    <div class="command-code">DOCKER_BUILDKIT=1 docker build -t app .<br>docker buildx create --use</div>
+                    <div class="command-desc">Enables BuildKit for faster builds and advanced features</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Multi-Platform Build</div>
+                    <div class="command-code">docker buildx build --platform linux/amd64,linux/arm64 \<br>  -t user/app:latest --push .</div>
+                    <div class="command-desc">Builds for multiple architectures simultaneously</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Layer Caching</div>
+                    <div class="command-code">COPY package*.json ./<br>RUN npm install<br>COPY . .</div>
+                    <div class="command-desc">Copies dependencies first to cache npm install layer</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">.dockerignore</div>
+                    <div class="command-code">node_modules<br>.git<br>*.log<br>.env*<br>README.md</div>
+                    <div class="command-desc">Excludes files from build context (speeds up builds)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Health Check in Dockerfile</div>
+                    <div class="command-code">HEALTHCHECK --interval=30s --timeout=3s \<br>  --start-period=5s --retries=3 \<br>  CMD curl -f http://localhost:8080/health || exit 1</div>
+                    <div class="command-desc">Defines container health check</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Private Registry</div>
+                    <div class="command-code">docker run -d -p 5000:5000 --name registry registry:2<br>docker tag myapp localhost:5000/myapp<br>docker push localhost:5000/myapp</div>
+                    <div class="command-desc">Runs local Docker registry</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Content Trust</div>
+                    <div class="command-code">export DOCKER_CONTENT_TRUST=1<br>docker pull nginx</div>
+                    <div class="command-desc">Enables image signature verification</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Image Scanning</div>
+                    <div class="command-code">docker scan myapp:latest</div>
+                    <div class="command-desc">Scans image for security vulnerabilities</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">CPU Pinning</div>
+                    <div class="command-code">docker run --cpuset-cpus="0,1" app</div>
+                    <div class="command-desc">Restricts container to specific CPU cores</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Memory Swap</div>
+                    <div class="command-code">docker run --memory="512m" --memory-swap="1g" app</div>
+                    <div class="command-desc">Sets memory and swap limits</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">OOM Killer</div>
+                    <div class="command-code">docker run --oom-kill-disable --memory="512m" app</div>
+                    <div class="command-desc">Disables OOM killer (use with memory limit)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Device Cgroup Rules</div>
+                    <div class="command-code">docker run --device-write-bps /dev/sda:1mb app</div>
+                    <div class="command-desc">Limits device write bandwidth</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">PID Namespace</div>
+                    <div class="command-code">docker run --pid=host app</div>
+                    <div class="command-desc">Shares host PID namespace (see host processes)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">User Namespaces</div>
+                    <div class="command-code">docker run --userns=host app</div>
+                    <div class="command-desc">Disables user namespace remapping</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Security Considerations</div>
+                <p>⚠ Avoid running containers as root (use USER instruction)</p>
+                <p>⚠ Don't use --privileged unless absolutely necessary</p>
+                <p>⚠ Scan images regularly for vulnerabilities</p>
+                <p>⚠ Keep base images updated</p>
+                <p>⚠ Use multi-stage builds to reduce attack surface</p>
+                <p>⚠ Enable Content Trust for production</p>
+                <p>⚠ Limit container capabilities with --cap-drop and --cap-add</p>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="section">
+            <h2 class="section-title">Best Practices</h2>
+            <div class="info-box">
+                <div class="info-box-title">Dockerfile Optimization</div>
+                <p>✓ Use specific image tags, not <code>latest</code> (e.g., <code>nginx:1.21-alpine</code>)</p>
+                <p>✓ Combine RUN commands to reduce layers: <code>RUN apt-get update && apt-get install -y pkg</code></p>
+                <p>✓ Order instructions from least to most frequently changed</p>
+                <p>✓ Use .dockerignore to exclude unnecessary files</p>
+                <p>✓ Use multi-stage builds for smaller production images</p>
+                <p>✓ Run as non-root user for security</p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Container Management</div>
+                <p>✓ Use meaningful container names (--name)</p>
+                <p>✓ Set restart policy for production (--restart=unless-stopped)</p>
+                <p>✓ Define resource limits to prevent resource exhaustion</p>
+                <p>✓ Use health checks to monitor container status</p>
+                <p>✓ Keep containers ephemeral - store data in volumes</p>
+                <p>✓ One process per container (separation of concerns)</p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Production Deployment</div>
+                <p>✓ Use Docker Compose for multi-container apps</p>
+                <p>✓ Use Swarm or Kubernetes for orchestration</p>
+                <p>✓ Implement centralized logging (ELK stack, Splunk)</p>
+                <p>✓ Monitor containers with Prometheus, Grafana, or similar</p>
+                <p>✓ Use overlay networks for swarm communication</p>
+                <p>✓ Implement CI/CD pipelines for automated deployments</p>
+                <p>✓ Regular security scanning and updates</p>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Common Pitfalls</div>
+                <p>⚠ Not cleaning up unused resources (images, volumes, networks)</p>
+                <p>⚠ Storing secrets in images or environment variables</p>
+                <p>⚠ Running containers as root user</p>
+                <p>⚠ Not setting resource limits (CPU, memory)</p>
+                <p>⚠ Using <code>latest</code> tag in production</p>
+                <p>⚠ Not implementing health checks</p>
+                <p>⚠ Ignoring container logs</p>
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section">
+            <h2 class="section-title">Quick Command Reference</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Command</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag">Container</span></td>
+                        <td><code>docker run/start/stop/rm</code></td>
+                        <td>Manage container lifecycle</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">Image</span></td>
+                        <td><code>docker build/pull/push/rmi</code></td>
+                        <td>Manage Docker images</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-secondary">Volume</span></td>
+                        <td><code>docker volume create/ls/rm</code></td>
+                        <td>Manage persistent data</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-secondary">Network</span></td>
+                        <td><code>docker network create/ls/rm</code></td>
+                        <td>Manage container networks</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-tertiary">Compose</span></td>
+                        <td><code>docker-compose up/down/logs</code></td>
+                        <td>Multi-container orchestration</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">Swarm</span></td>
+                        <td><code>docker swarm init/join/leave</code></td>
+                        <td>Cluster management</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-secondary">Service</span></td>
+                        <td><code>docker service create/scale/update</code></td>
+                        <td>Manage swarm services</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-tertiary">Stack</span></td>
+                        <td><code>docker stack deploy/rm/ls</code></td>
+                        <td>Deploy multi-service apps</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">Secret</span></td>
+                        <td><code>docker secret create/ls/rm</code></td>
+                        <td>Manage sensitive data</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-secondary">System</span></td>
+                        <td><code>docker system prune/df/info</code></td>
+                        <td>System maintenance</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section class="section">
+            <h2 class="section-title">Troubleshooting Guide</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Container Won't Start</div>
+                    <div class="command-code">docker logs container-name<br>docker inspect container-name<br>docker events</div>
+                    <div class="command-desc">Check logs, inspect configuration, monitor events</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Port Already in Use</div>
+                    <div class="command-code">sudo lsof -i :8080<br>sudo netstat -tulpn | grep 8080</div>
+                    <div class="command-desc">Find process using port, kill if necessary</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Out of Disk Space</div>
+                    <div class="command-code">docker system df<br>docker system prune -a --volumes</div>
+                    <div class="command-desc">Check usage, clean up unused resources</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Network Issues</div>
+                    <div class="command-code">docker network inspect bridge<br>docker exec container ping other-container</div>
+                    <div class="command-desc">Inspect network, test connectivity</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Permission Denied</div>
+                    <div class="command-code">sudo usermod -aG docker $USER<br>newgrp docker</div>
+                    <div class="command-desc">Add user to docker group, reload groups</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Build Failures</div>
+                    <div class="command-code">docker build --no-cache -t app .<br>docker build --progress=plain -t app .</div>
+                    <div class="command-desc">Rebuild without cache, show detailed output</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Performance Issues</div>
+                    <div class="command-code">docker stats<br>docker top container-name</div>
+                    <div class="command-desc">Monitor resource usage and processes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Docker Daemon Issues</div>
+                    <div class="command-code">sudo systemctl status docker<br>sudo journalctl -u docker -f</div>
+                    <div class="command-desc">Check daemon status and logs</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="footer">
+        <p>Docker Cheatsheet | Container Platform Complete Reference</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">For detailed documentation, visit: <a href="https://docs.docker.com" style="color: var(--accent-primary);">docs.docker.com</a></p>
+    </div>
+
+    <script src="../assets/js/cheatsheet.js"></script>
+</body>
+</html>

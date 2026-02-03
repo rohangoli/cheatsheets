@@ -9,15 +9,13 @@ const cheatsheets = [
         title: 'KVM',
         description: 'Kernel-based Virtual Machine commands and operations for managing virtual machines on Linux.',
         tags: ['Virtualization', 'Linux', 'VM']
+    },
+    {
+        file: 'docker-cheatsheet.html',
+        title: 'Docker',
+        description: 'Container management and Docker CLI commands.',
+        tags: ['Containers', 'DevOps']
     }
-    // Add more cheatsheets here as you create them
-    // Example:
-    // {
-    //     file: 'docker-cheatsheet.html',
-    //     title: 'Docker',
-    //     description: 'Container management and Docker CLI commands.',
-    //     tags: ['Containers', 'DevOps']
-    // }
 ];
 
 // Function to create cheatsheet card
