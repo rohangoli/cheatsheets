@@ -1,0 +1,167 @@
+/* Home page specific styles */
+body {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding: 2rem 0;
+}
+
+h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    animation: slideDown 0.6s ease-out;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    animation: fadeIn 0.8s ease-out 0.2s both;
+}
+
+.cheatsheets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.cheatsheet-card {
+    background: var(--bg-medium);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 0.6s ease-out both;
+}
+
+.cheatsheet-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.cheatsheet-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--accent-primary);
+    box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+}
+
+.cheatsheet-card:hover::before {
+    transform: scaleX(1);
+}
+
+.cheatsheet-card h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.cheatsheet-card .description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.cheatsheet-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.cheatsheet-link:hover {
+    gap: 1rem;
+    color: var(--accent-secondary);
+}
+
+.cheatsheet-link::after {
+    content: '→';
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+}
+
+.cheatsheet-link:hover::after {
+    transform: translateX(4px);
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid var(--accent-primary);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--accent-primary);
+    margin-top: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+footer {
+    text-align: center;
+    margin-top: 5rem;
+    padding: 2rem 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+footer a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--accent-secondary);
+}
+
+.no-cheatsheets {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    .cheatsheets-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .cheatsheet-card {
+        padding: 1.5rem;
+    }
+}

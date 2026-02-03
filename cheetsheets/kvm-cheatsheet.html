@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KVM Cheatsheet - Visual Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fira+Code:wght@400;600&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="../assets/css/cheatsheet.css">
+</head>
+<body>
+    <div class="hero">
+        <h1>KVM CHEATSHEET</h1>
+        <p class="subtitle">Kernel-based Virtual Machine | Complete Visual Guide to Concepts & Commands</p>
+    </div>
+
+    <div class="container">
+        <!-- Architecture Section -->
+        <section class="section">
+            <h2 class="section-title">KVM Architecture</h2>
+            <div class="architecture">
+                <p>KVM transforms Linux into a Type-1 hypervisor, allowing multiple virtual machines to run on a single physical host.</p>
+                <div class="arch-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">📱 Guest VMs (Virtual Machines)</div>
+                        <div class="arch-layer-desc">Guest OS + Applications running in isolated environments</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">🔧 QEMU (User Space)</div>
+                        <div class="arch-layer-desc">Device emulation, I/O handling, and VM management interface</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">⚙️ KVM Module (Kernel Space)</div>
+                        <div class="arch-layer-desc">Hardware virtualization extensions (Intel VT-x / AMD-V)</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">💻 Linux Kernel</div>
+                        <div class="arch-layer-desc">Host operating system providing resource management</div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">🖥️ Physical Hardware</div>
+                        <div class="arch-layer-desc">CPU, Memory, Storage, Network interfaces</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Key Concept</div>
+                <p>KVM requires CPU virtualization support (Intel VT-x or AMD-V). Check with: <code>egrep -c '(vmx|svm)' /proc/cpuinfo</code></p>
+                <p style="margin-top: 0.5rem;">A result greater than 0 means virtualization is supported.</p>
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section class="section">
+            <h2 class="section-title">Installation & Setup</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Ubuntu/Debian Installation</div>
+                    <div class="command-code">sudo apt update<br>sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager</div>
+                    <div class="command-desc">Installs KVM, QEMU, libvirt tools, and virtual machine manager GUI</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">RHEL/CentOS Installation</div>
+                    <div class="command-code">sudo yum install qemu-kvm libvirt virt-install virt-manager</div>
+                    <div class="command-desc">Installs KVM stack on Red Hat based systems</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Verify KVM Module</div>
+                    <div class="command-code">lsmod | grep kvm</div>
+                    <div class="command-desc">Check if KVM kernel modules are loaded (kvm_intel or kvm_amd)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Check Virtualization Support</div>
+                    <div class="command-code">egrep -c '(vmx|svm)' /proc/cpuinfo</div>
+                    <div class="command-desc">Returns number of CPU cores with virtualization support</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Add User to Groups</div>
+                    <div class="command-code">sudo usermod -aG libvirt $USER<br>sudo usermod -aG kvm $USER</div>
+                    <div class="command-desc">Grants permissions to manage VMs without sudo</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Start libvirt Service</div>
+                    <div class="command-code">sudo systemctl enable --now libvirtd</div>
+                    <div class="command-desc">Enables and starts the libvirt daemon for VM management</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VM Creation Flow -->
+        <section class="section">
+            <h2 class="section-title">VM Creation Workflow</h2>
+            <div class="visual-flow">
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div class="flow-number">1</div>
+                        <div class="flow-title">Prepare</div>
+                        <div class="flow-desc">ISO image & resources</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">2</div>
+                        <div class="flow-title">Create</div>
+                        <div class="flow-desc">VM with virt-install</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">3</div>
+                        <div class="flow-title">Configure</div>
+                        <div class="flow-desc">CPU, RAM, disk</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">4</div>
+                        <div class="flow-title">Start</div>
+                        <div class="flow-desc">Boot the VM</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">5</div>
+                        <div class="flow-title">Manage</div>
+                        <div class="flow-desc">Monitor & control</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VM Management Commands -->
+        <section class="section">
+            <h2 class="section-title">VM Management Commands</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> List All VMs</div>
+                    <div class="command-code">virsh list --all</div>
+                    <div class="command-desc">Shows all VMs (running and stopped) with their state and ID</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Start VM</div>
+                    <div class="command-code">virsh start vm-name</div>
+                    <div class="command-desc">Boots the specified virtual machine</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Shutdown VM</div>
+                    <div class="command-code">virsh shutdown vm-name</div>
+                    <div class="command-desc">Gracefully shuts down the VM via ACPI signal</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Force Stop VM</div>
+                    <div class="command-code">virsh destroy vm-name</div>
+                    <div class="command-desc">Immediately stops the VM (like pulling power plug)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Autostart VM</div>
+                    <div class="command-code">virsh autostart vm-name</div>
+                    <div class="command-desc">VM automatically starts when host boots</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Disable Autostart</div>
+                    <div class="command-code">virsh autostart --disable vm-name</div>
+                    <div class="command-desc">Removes autostart configuration for VM</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Reboot VM</div>
+                    <div class="command-code">virsh reboot vm-name</div>
+                    <div class="command-desc">Gracefully reboots the virtual machine</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Suspend VM</div>
+                    <div class="command-code">virsh suspend vm-name</div>
+                    <div class="command-desc">Pauses VM execution (RAM kept in memory)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Resume VM</div>
+                    <div class="command-code">virsh resume vm-name</div>
+                    <div class="command-desc">Continues execution of suspended VM</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> Delete VM</div>
+                    <div class="command-code">virsh undefine vm-name --remove-all-storage</div>
+                    <div class="command-desc">Removes VM configuration and associated storage</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> VM Information</div>
+                    <div class="command-code">virsh dominfo vm-name</div>
+                    <div class="command-desc">Displays detailed information about the VM</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag">virsh</span> VM Console</div>
+                    <div class="command-code">virsh console vm-name</div>
+                    <div class="command-desc">Connects to VM's serial console (Ctrl+] to exit)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VM Creation Commands -->
+        <section class="section">
+            <h2 class="section-title">VM Creation Commands</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">virt-install</span> Basic VM Creation</div>
+                    <div class="command-code">virt-install --name=myvm \<br>  --vcpus=2 --memory=2048 \<br>  --cdrom=/path/to/os.iso \<br>  --disk size=20 \<br>  --os-variant=ubuntu20.04</div>
+                    <div class="command-desc">Creates a VM with 2 vCPUs, 2GB RAM, 20GB disk</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">virt-install</span> Network Install</div>
+                    <div class="command-code">virt-install --name=netvm \<br>  --vcpus=2 --memory=2048 \<br>  --location='http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/' \<br>  --disk size=20</div>
+                    <div class="command-desc">Creates VM using network installation source</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">virt-install</span> Import Existing Disk</div>
+                    <div class="command-code">virt-install --name=imported \<br>  --memory=2048 --vcpus=2 \<br>  --disk /path/to/existing.qcow2 \<br>  --import --os-variant=ubuntu20.04</div>
+                    <div class="command-desc">Creates VM from pre-existing disk image</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-secondary">virt-install</span> Headless VM</div>
+                    <div class="command-code">virt-install --name=headless \<br>  --vcpus=2 --memory=2048 \<br>  --disk size=20 \<br>  --cdrom=/path/to/os.iso \<br>  --graphics=none \<br>  --console=pty,target_type=serial</div>
+                    <div class="command-desc">Creates VM without graphics, console-only access</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Create Disk Image</div>
+                    <div class="command-code">qemu-img create -f qcow2 mydisk.qcow2 20G</div>
+                    <div class="command-desc">Creates a 20GB QCOW2 format disk image</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Resize Disk</div>
+                    <div class="command-code">qemu-img resize mydisk.qcow2 +10G</div>
+                    <div class="command-desc">Increases disk size by 10GB</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Convert Format</div>
+                    <div class="command-code">qemu-img convert -f raw -O qcow2 image.img image.qcow2</div>
+                    <div class="command-desc">Converts raw disk image to QCOW2 format</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Disk Information</div>
+                    <div class="command-code">qemu-img info mydisk.qcow2</div>
+                    <div class="command-desc">Shows disk format, size, and other details</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Disk Format Comparison</div>
+                <p><strong>QCOW2:</strong> Copy-on-write, compression, snapshots supported, thin provisioning</p>
+                <p><strong>RAW:</strong> Better performance, no advanced features, full disk allocation</p>
+                <p><strong>VDI:</strong> VirtualBox format, requires conversion for KVM use</p>
+            </div>
+        </section>
+
+        <!-- Disk Overlay Management -->
+        <section class="section">
+            <h2 class="section-title">Disk Overlay Management</h2>
+            <div class="info-box">
+                <div class="info-box-title">What are Disk Overlays?</div>
+                <p>Disk overlays (backing files) create a layered disk structure where changes are written to a new overlay file while the base image remains unchanged. This enables efficient cloning, testing, and development workflows.</p>
+                <p style="margin-top: 0.5rem;"><strong>Use Cases:</strong> Quick VM clones, safe testing environments, template-based deployments, development snapshots</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Create Overlay Disk</div>
+                    <div class="command-code">qemu-img create -f qcow2 \<br>  -b /path/to/base.qcow2 \<br>  -F qcow2 overlay.qcow2</div>
+                    <div class="command-desc">Creates overlay disk using base image as backing file (-F specifies backing file format)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> View Backing Chain</div>
+                    <div class="command-code">qemu-img info --backing-chain overlay.qcow2</div>
+                    <div class="command-desc">Displays complete backing file chain and dependencies</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Check Backing File</div>
+                    <div class="command-code">qemu-img info overlay.qcow2 | grep backing</div>
+                    <div class="command-desc">Shows which base image the overlay depends on</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Rebase Overlay</div>
+                    <div class="command-code">qemu-img rebase -b /new/base.qcow2 \<br>  -F qcow2 overlay.qcow2</div>
+                    <div class="command-desc">Changes the backing file of an overlay (for moving/reorganizing)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Commit Overlay Changes</div>
+                    <div class="command-code">qemu-img commit overlay.qcow2</div>
+                    <div class="command-desc">Merges overlay changes back into the backing file</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header"><span class="tag-tertiary">qemu-img</span> Flatten Overlay</div>
+                    <div class="command-code">qemu-img convert -O qcow2 \<br>  overlay.qcow2 standalone.qcow2</div>
+                    <div class="command-desc">Creates standalone disk by merging overlay with all backing files</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create VM with Overlay</div>
+                    <div class="command-code">virt-install --name=test-vm \<br>  --disk /path/to/overlay.qcow2 \<br>  --import --memory=2048 --vcpus=2</div>
+                    <div class="command-desc">Creates VM using overlay disk (base remains untouched)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Check Overlay Size</div>
+                    <div class="command-code">qemu-img info overlay.qcow2 | grep -E "virtual size|disk size"</div>
+                    <div class="command-desc">Shows virtual size vs actual disk space used by overlay</div>
+                </div>
+            </div>
+
+            <div class="visual-flow">
+                <h3 style="color: var(--accent-tertiary); margin-bottom: 1rem; text-align: center;">Overlay Chain Structure</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div class="flow-number">1</div>
+                        <div class="flow-title">Base Image</div>
+                        <div class="flow-desc">Read-only template (e.g., ubuntu.qcow2)</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">2</div>
+                        <div class="flow-title">Overlay 1</div>
+                        <div class="flow-desc">First layer (vm1.qcow2)</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">3</div>
+                        <div class="flow-title">Overlay 2</div>
+                        <div class="flow-desc">Second layer (vm1-dev.qcow2)</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">4</div>
+                        <div class="flow-title">Active VM</div>
+                        <div class="flow-desc">Reads from all layers</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Important Overlay Considerations</div>
+                <p>⚠ <strong>Never modify base image:</strong> Changes break all dependent overlays</p>
+                <p>⚠ <strong>Never move base without rebase:</strong> Overlays store absolute/relative paths</p>
+                <p>⚠ <strong>Performance impact:</strong> Deep chains (3+ layers) can slow I/O operations</p>
+                <p>⚠ <strong>Backup both files:</strong> Base and overlay are both required for VM to work</p>
+                <p>⚠ <strong>Chain depth:</strong> Keep overlay chains shallow (2-3 layers max recommended)</p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Common Overlay Workflows</div>
+                <p><strong>Template-based deployment:</strong> Create base image → Create overlay per VM → Deploy multiple VMs quickly</p>
+                <p><strong>Safe testing:</strong> Create overlay from production disk → Test changes → Discard or commit</p>
+                <p><strong>Development branches:</strong> Base image → Dev overlay → Feature branch overlays</p>
+                <p><strong>Golden images:</strong> Maintain clean base → Create overlays for customization → Easy updates</p>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Quick Clone with Overlay</div>
+                    <div class="command-code"># Create base template<br>qemu-img create -f qcow2 template.qcow2 20G<br># Install OS on template...<br><br># Create clones<br>qemu-img create -f qcow2 -b template.qcow2 -F qcow2 vm1.qcow2<br>qemu-img create -f qcow2 -b template.qcow2 -F qcow2 vm2.qcow2</div>
+                    <div class="command-desc">Fast VM cloning workflow using base template</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Convert Overlay to Standalone</div>
+                    <div class="command-code"># Merge overlay with base<br>qemu-img convert -O qcow2 overlay.qcow2 standalone.qcow2<br><br># Or use backing chain<br>qemu-img convert -O qcow2 -B overlay.qcow2 new.qcow2</div>
+                    <div class="command-desc">Creates independent disk without backing file dependencies</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Verify Overlay Integrity</div>
+                    <div class="command-code">qemu-img check overlay.qcow2<br>qemu-img check -r all overlay.qcow2</div>
+                    <div class="command-desc">Checks overlay for errors; -r all attempts repairs</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Move Base Image Safely</div>
+                    <div class="command-code"># Move base<br>mv /old/path/base.qcow2 /new/path/<br><br># Rebase overlay<br>qemu-img rebase -u -b /new/path/base.qcow2 overlay.qcow2</div>
+                    <div class="command-desc">Relocate base image and update overlay references (-u for unsafe mode)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create Multi-Layer Chain</div>
+                    <div class="command-code"># Base<br>qemu-img create -f qcow2 base.qcow2 20G<br><br># Layer 1<br>qemu-img create -f qcow2 -b base.qcow2 -F qcow2 layer1.qcow2<br><br># Layer 2<br>qemu-img create -f qcow2 -b layer1.qcow2 -F qcow2 layer2.qcow2</div>
+                    <div class="command-desc">Creates deep overlay chain for complex scenarios</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Merge Overlay to Base</div>
+                    <div class="command-code"># Stop VM first<br>virsh shutdown vm-name<br><br># Commit changes<br>qemu-img commit overlay.qcow2<br><br># Now base contains all changes</div>
+                    <div class="command-desc">Permanently applies overlay changes to base image</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resource Management -->
+        <section class="section">
+            <h2 class="section-title">Resource Configuration</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Change CPU Count</div>
+                    <div class="command-code">virsh setvcpus vm-name 4 --config --maximum<br>virsh setvcpus vm-name 4 --config</div>
+                    <div class="command-desc">Sets maximum and current vCPUs to 4 (requires VM restart)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Change Memory</div>
+                    <div class="command-code">virsh setmaxmem vm-name 4G --config<br>virsh setmem vm-name 4G --config</div>
+                    <div class="command-desc">Sets maximum and current memory to 4GB</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Live Memory Change</div>
+                    <div class="command-code">virsh setmem vm-name 2G --live</div>
+                    <div class="command-desc">Changes memory for running VM (within max limit)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Attach Disk</div>
+                    <div class="command-code">virsh attach-disk vm-name \<br>  /path/to/disk.qcow2 vdb \<br>  --driver qemu --subdriver qcow2 \<br>  --persistent</div>
+                    <div class="command-desc">Adds additional disk to VM as /dev/vdb</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Detach Disk</div>
+                    <div class="command-code">virsh detach-disk vm-name vdb --persistent</div>
+                    <div class="command-desc">Removes disk device from VM configuration</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Edit VM Configuration</div>
+                    <div class="command-code">virsh edit vm-name</div>
+                    <div class="command-desc">Opens VM XML config in text editor for manual changes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">View XML Configuration</div>
+                    <div class="command-code">virsh dumpxml vm-name</div>
+                    <div class="command-desc">Displays complete VM configuration in XML format</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">CPU Pinning</div>
+                    <div class="command-code">virsh vcpupin vm-name 0 1</div>
+                    <div class="command-desc">Pins vCPU 0 to physical CPU core 1 for better performance</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Snapshots -->
+        <section class="section">
+            <h2 class="section-title">Snapshot Management</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Create Snapshot</div>
+                    <div class="command-code">virsh snapshot-create-as vm-name \<br>  snapshot-name \<br>  "Description here"</div>
+                    <div class="command-desc">Creates named snapshot of VM's current state</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Snapshots</div>
+                    <div class="command-code">virsh snapshot-list vm-name</div>
+                    <div class="command-desc">Shows all snapshots for specified VM</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Snapshot Information</div>
+                    <div class="command-code">virsh snapshot-info vm-name snapshot-name</div>
+                    <div class="command-desc">Displays detailed snapshot metadata and info</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Revert to Snapshot</div>
+                    <div class="command-code">virsh snapshot-revert vm-name snapshot-name</div>
+                    <div class="command-desc">Restores VM to snapshot state (current state lost)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Delete Snapshot</div>
+                    <div class="command-code">virsh snapshot-delete vm-name snapshot-name</div>
+                    <div class="command-desc">Removes snapshot (frees up disk space)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Current Snapshot</div>
+                    <div class="command-code">virsh snapshot-current vm-name</div>
+                    <div class="command-desc">Shows which snapshot the VM is currently using</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Snapshot Types</div>
+                <p><strong>Internal Snapshots:</strong> Stored within QCOW2 disk file, easy but impacts performance</p>
+                <p><strong>External Snapshots:</strong> Create new disk files, better performance but complex management</p>
+            </div>
+        </section>
+
+        <!-- Networking -->
+        <section class="section">
+            <h2 class="section-title">Network Configuration</h2>
+            <div class="network-diagram">
+                <h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">Network Modes</h3>
+                <div class="network-types">
+                    <div class="network-card">
+                        <div class="network-icon">🌐</div>
+                        <div class="network-title">NAT (Default)</div>
+                        <div class="command-desc">VMs share host's IP via NAT, can access internet but not directly accessible from outside</div>
+                    </div>
+                    <div class="network-card">
+                        <div class="network-icon">🌉</div>
+                        <div class="network-title">Bridge</div>
+                        <div class="command-desc">VMs get their own IP on physical network, act like physical machines on LAN</div>
+                    </div>
+                    <div class="network-card">
+                        <div class="network-icon">🔒</div>
+                        <div class="network-title">Host-Only</div>
+                        <div class="command-desc">VMs can only communicate with host and each other, no external access</div>
+                    </div>
+                    <div class="network-card">
+                        <div class="network-icon">📡</div>
+                        <div class="network-title">Macvtap</div>
+                        <div class="command-desc">Direct connection to physical NIC, high performance, limited host communication</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">List Networks</div>
+                    <div class="command-code">virsh net-list --all</div>
+                    <div class="command-desc">Shows all virtual networks (active and inactive)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Network Details</div>
+                    <div class="command-code">virsh net-info default</div>
+                    <div class="command-desc">Displays information about network configuration</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Start Network</div>
+                    <div class="command-code">virsh net-start default</div>
+                    <div class="command-desc">Activates the virtual network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Autostart Network</div>
+                    <div class="command-code">virsh net-autostart default</div>
+                    <div class="command-desc">Network starts automatically with libvirtd</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create Bridge Network</div>
+                    <div class="command-code">virsh net-define /path/to/bridge.xml<br>virsh net-start bridgename<br>virsh net-autostart bridgename</div>
+                    <div class="command-desc">Creates and starts custom bridge network from XML</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">DHCP Leases</div>
+                    <div class="command-code">virsh net-dhcp-leases default</div>
+                    <div class="command-desc">Shows IP addresses assigned to VMs on network</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Attach Network Interface</div>
+                    <div class="command-code">virsh attach-interface vm-name \<br>  --type network \<br>  --source default \<br>  --model virtio --persistent</div>
+                    <div class="command-desc">Adds network interface to VM</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">VM IP Address</div>
+                    <div class="command-code">virsh domifaddr vm-name</div>
+                    <div class="command-desc">Displays IP addresses of VM network interfaces</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monitoring & Performance -->
+        <section class="section">
+            <h2 class="section-title">Monitoring & Performance</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">VM Statistics</div>
+                    <div class="command-code">virt-top</div>
+                    <div class="command-desc">Real-time monitoring of all VMs (like top for VMs)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">CPU Stats</div>
+                    <div class="command-code">virsh cpu-stats vm-name</div>
+                    <div class="command-desc">Shows CPU usage statistics for VM</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Memory Stats</div>
+                    <div class="command-code">virsh dommemstat vm-name</div>
+                    <div class="command-desc">Displays memory usage and statistics</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Disk I/O Stats</div>
+                    <div class="command-code">virsh domblkstat vm-name vda</div>
+                    <div class="command-desc">Shows read/write statistics for disk device</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Network I/O Stats</div>
+                    <div class="command-code">virsh domifstat vm-name vnet0</div>
+                    <div class="command-desc">Displays network interface traffic statistics</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">All VM Stats</div>
+                    <div class="command-code">virsh domstats vm-name</div>
+                    <div class="command-desc">Comprehensive statistics for all VM resources</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Host Information</div>
+                    <div class="command-code">virsh nodeinfo</div>
+                    <div class="command-desc">Shows host hardware capabilities and resources</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Block Devices</div>
+                    <div class="command-code">virsh domblklist vm-name</div>
+                    <div class="command-desc">Lists all disk devices attached to VM</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Operations -->
+        <section class="section">
+            <h2 class="section-title">Advanced Operations</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">Clone VM</div>
+                    <div class="command-code">virt-clone --original vm-name \<br>  --name new-vm \<br>  --auto-clone</div>
+                    <div class="command-desc">Creates complete copy of VM with new MAC/UUID</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">VM Migration (Offline)</div>
+                    <div class="command-code">virsh migrate --offline vm-name \<br>  qemu+ssh://user@dest-host/system</div>
+                    <div class="command-desc">Migrates powered-off VM to another host</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">VM Migration (Live)</div>
+                    <div class="command-code">virsh migrate --live vm-name \<br>  qemu+ssh://user@dest-host/system</div>
+                    <div class="command-desc">Migrates running VM with minimal downtime</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Export VM XML</div>
+                    <div class="command-code">virsh dumpxml vm-name > vm-config.xml</div>
+                    <div class="command-desc">Backs up VM configuration to XML file</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Import VM</div>
+                    <div class="command-code">virsh define vm-config.xml</div>
+                    <div class="command-desc">Creates VM from saved XML configuration</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Save VM State</div>
+                    <div class="command-code">virsh save vm-name vm-state.save</div>
+                    <div class="command-desc">Saves running VM state to file (hibernation)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Restore VM State</div>
+                    <div class="command-code">virsh restore vm-state.save</div>
+                    <div class="command-desc">Restores VM from saved state file</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Backup VM Disk</div>
+                    <div class="command-code">virsh domblklist vm-name<br>cp /var/lib/libvirt/images/vm.qcow2 backup/</div>
+                    <div class="command-desc">Creates backup copy of VM disk (VM must be off)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Compress Disk</div>
+                    <div class="command-code">qemu-img convert -O qcow2 -c \<br>  original.qcow2 compressed.qcow2</div>
+                    <div class="command-desc">Compresses QCOW2 disk to reclaim space</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Migration Prerequisites</div>
+                <p>✓ Shared storage OR copy disk files manually</p>
+                <p>✓ SSH access between hosts</p>
+                <p>✓ Same libvirt version on both hosts</p>
+                <p>✓ Network connectivity between hosts</p>
+            </div>
+        </section>
+
+        <!-- Storage Pools -->
+        <section class="section">
+            <h2 class="section-title">Storage Pool Management</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">List Storage Pools</div>
+                    <div class="command-code">virsh pool-list --all</div>
+                    <div class="command-desc">Shows all storage pools (active and inactive)</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create Directory Pool</div>
+                    <div class="command-code">virsh pool-define-as mypool dir \<br>  --target /var/lib/libvirt/mypool<br>virsh pool-build mypool<br>virsh pool-start mypool</div>
+                    <div class="command-desc">Creates directory-based storage pool</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Pool Information</div>
+                    <div class="command-code">virsh pool-info default</div>
+                    <div class="command-desc">Displays pool capacity and usage details</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">List Volumes</div>
+                    <div class="command-code">virsh vol-list default</div>
+                    <div class="command-desc">Shows all volumes in specified pool</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Create Volume</div>
+                    <div class="command-code">virsh vol-create-as default \<br>  volume-name 10G --format qcow2</div>
+                    <div class="command-desc">Creates 10GB volume in default pool</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Delete Volume</div>
+                    <div class="command-code">virsh vol-delete volume-name default</div>
+                    <div class="command-desc">Removes volume from storage pool</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Refresh Pool</div>
+                    <div class="command-code">virsh pool-refresh default</div>
+                    <div class="command-desc">Scans pool directory for new volumes</div>
+                </div>
+
+                <div class="command-card">
+                    <div class="command-header">Autostart Pool</div>
+                    <div class="command-code">virsh pool-autostart default</div>
+                    <div class="command-desc">Pool automatically starts with libvirtd</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Reference Table -->
+        <section class="section">
+            <h2 class="section-title">Quick Command Reference</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Command</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag">Power</span></td>
+                        <td><code>virsh start/shutdown/destroy/reboot</code></td>
+                        <td>Control VM power state</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">Info</span></td>
+                        <td><code>virsh list/dominfo/nodeinfo</code></td>
+                        <td>View VM and host information</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-secondary">Create</span></td>
+                        <td><code>virt-install</code></td>
+                        <td>Create new virtual machines</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-secondary">Clone</span></td>
+                        <td><code>virt-clone</code></td>
+                        <td>Duplicate existing VMs</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-tertiary">Disk</span></td>
+                        <td><code>qemu-img create/convert/resize</code></td>
+                        <td>Manage disk images</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">Snapshot</span></td>
+                        <td><code>virsh snapshot-create-as/revert</code></td>
+                        <td>Manage VM snapshots</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-secondary">Network</span></td>
+                        <td><code>virsh net-list/dhcp-leases</code></td>
+                        <td>Configure networking</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-tertiary">Monitor</span></td>
+                        <td><code>virt-top/virsh domstats</code></td>
+                        <td>Monitor performance</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="section">
+            <h2 class="section-title">Best Practices & Tips</h2>
+            <div class="info-box">
+                <div class="info-box-title">Performance Optimization</div>
+                <p>✓ Use virtio drivers for network and disk (better performance)</p>
+                <p>✓ Enable KSM (Kernel Same-page Merging) for memory deduplication</p>
+                <p>✓ Use host-passthrough CPU mode for better performance</p>
+                <p>✓ Allocate appropriate resources - avoid over-commitment</p>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">Security Considerations</div>
+                <p>⚠ Keep host and guest systems updated</p>
+                <p>⚠ Use separate networks for different security zones</p>
+                <p>⚠ Implement firewall rules on host and guests</p>
+                <p>⚠ Use snapshots before major changes (easy rollback)</p>
+                <p>⚠ Regular backups of VM disks and configurations</p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Troubleshooting</div>
+                <p><strong>VM won't start:</strong> Check logs with <code>virsh dominfo vm-name</code> and <code>journalctl -xe</code></p>
+                <p><strong>Network issues:</strong> Verify with <code>virsh net-list</code> and check bridge status</p>
+                <p><strong>Performance problems:</strong> Monitor with <code>virt-top</code> and adjust resources</p>
+                <p><strong>Disk full:</strong> Use <code>qemu-img convert -c</code> to compress images</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="footer">
+        <p>KVM Cheatsheet | Kernel-based Virtual Machine Reference Guide</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">For detailed documentation, visit: <code>man virsh</code>, <code>man virt-install</code>, <code>man qemu-img</code></p>
+    </div>
+
+    <script src="../assets/js/cheatsheet.js"></script>
+</body>
+</html>
