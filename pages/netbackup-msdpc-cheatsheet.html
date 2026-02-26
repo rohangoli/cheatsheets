@@ -131,6 +131,13 @@
   }
   .arrow-label-highlight { fill: var(--accent); }
 
+  /* Fix: prevent page CSS (line-height etc.) from shifting SVG text positions */
+  svg text {
+    line-height: normal;
+    dominant-baseline: alphabetic;
+    alignment-baseline: baseline;
+  }
+
   /* ─── Flow Steps ─── */
   .flow-steps { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.5rem; }
   .step {
@@ -305,7 +312,7 @@
 <div class="section active" id="backup-flow">
   <div class="diagram" style="padding:1.5rem 1rem;">
     <div style="width:100%; overflow-x:auto;">
-      <svg viewBox="0 0 1040 520" xmlns="http://www.w3.org/2000/svg" style="display:block; min-width:900px; width:100%;">
+      <svg viewBox="0 0 1040 550" xmlns="http://www.w3.org/2000/svg" style="display:block; min-width:900px; width:100%;">
         <defs>
           <marker id="ah"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,1 L9,5 L0,9 Z" fill="#00d4ff"/></marker>
           <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,1 L9,5 L0,9 Z" fill="#22c55e"/></marker>
@@ -475,7 +482,7 @@
 <div class="section" id="restore-flow">
   <div class="diagram" style="padding:1.5rem 1rem;">
     <div style="width:100%; overflow-x:auto;">
-      <svg viewBox="0 0 1040 550" xmlns="http://www.w3.org/2000/svg" style="display:block; min-width:900px; width:100%;">
+      <svg viewBox="0 0 1040 600" xmlns="http://www.w3.org/2000/svg" style="display:block; min-width:900px; width:100%;">
         <defs>
           <marker id="ra"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,1 L9,5 L0,9 Z" fill="#ff6b35"/></marker>
           <marker id="ra2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,1 L9,5 L0,9 Z" fill="#00d4ff"/></marker>
@@ -550,7 +557,7 @@
         <!-- HOP-1 badge (S3-2 → Media2) -->
         <rect x="199" y="303" width="195" height="36" rx="3" fill="rgba(255,107,53,0.07)" stroke="rgba(255,107,53,0.3)" stroke-width="1"/>
         <text x="296" y="318" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="#ff6b35" font-weight="700">① S3 GET  ·  HOP 1</text>
-        <text x="296" y="331" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" fill="#64748b">full 64 MB container → download cache</text>
+        <text x="296" y="335" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" fill="#64748b">full 64 MB container → download cache</text>
         <line x1="197" y1="327" x2="397" y2="327" stroke="#ff6b35" stroke-width="1.8" marker-end="url(#ra)"/>
 
         <!-- Media Server 2 -->
