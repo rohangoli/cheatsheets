@@ -1,6 +1,6 @@
 // Home page JavaScript
 // Configuration
-const cheatsheetFolder = 'cheetsheets/';
+const cheatsheetFolder = 'pages/';
 
 // Define cheatsheets metadata
 const cheatsheets = [
@@ -15,6 +15,12 @@ const cheatsheets = [
         title: 'Docker',
         description: 'Container management and Docker CLI commands.',
         tags: ['Containers', 'DevOps']
+    },
+    {
+        file: 'netbackup-msdpc-cheatsheet.html',
+        title: 'NetBackup MSDP Cloud Object Store',
+        description: 'Cheatsheet for NetBackup Media Server Data Protection with Cloud Object Store.',
+        tags: ['Backup', 'NetBackup', 'MSDPC', 'Restore', 'Cloud']
     }
 ];
 
